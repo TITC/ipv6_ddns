@@ -3,8 +3,8 @@ import time
 import yaml
 from utils.logger import Logger
 from utils.network import get_ipv6
-from dns.aliyun import AliyunDNS
-from dns.cloudflare import CloudflareDNS
+from dns_providers.aliyun import AliyunDNS
+from dns_providers.cloudflare import CloudflareDNS
 
 def load_config():
     config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
