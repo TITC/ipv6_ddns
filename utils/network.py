@@ -15,9 +15,13 @@ def get_ipv6_from_websites(timeout=60):
         "https://v6.ident.me"
     ]
     
+    # 创建不使用代理的会话
+    session = requests.Session()
+    session.trust_env = False  # 避免因为代理不支持ipv6导致获取失败
+    
     for website in random.sample(websites, len(websites)):
         try:
-            response = requests.get(website, timeout=timeout)
+            response = session.get(website, timeout=timeout, proxies={'http': None, 'https': None})
             if response.status_code == 200:
                 ipv6 = response.text.strip()
                 logger.info(f"通过网站API获取IPv6地址成功: {ipv6} (来源: {website})")
@@ -25,6 +29,8 @@ def get_ipv6_from_websites(timeout=60):
         except requests.exceptions.RequestException as e:
             logger.warning(f"从 {website} 获取IPv6地址失败: {str(e)}")
     return None
+
+
 
 def get_ipv6_from_interface():
     """通过系统命令获取本地网卡IPv6地址"""
