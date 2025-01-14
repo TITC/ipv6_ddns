@@ -1,6 +1,7 @@
 import os
 import time
 import yaml
+import getpass
 from utils.logger import Logger
 from utils.network import get_ipv6
 from dns_providers.aliyun import AliyunDNS
@@ -26,13 +27,13 @@ def get_interactive_config():
     if input("是否启用阿里云DNS? (y/N): ").lower().strip() == 'y':
         config['aliyun']['enabled'] = True
         config['aliyun']['access_key_id'] = input("请输入阿里云AccessKey ID: ").strip()
-        config['aliyun']['access_key_secret'] = input("请输入阿里云AccessKey Secret: ").strip()
+        config['aliyun']['access_key_secret'] = getpass.getpass("请输入阿里云AccessKey Secret: ").strip()
         config['aliyun']['ttl'] = int(input("请输入TTL值(600-86400)[默认600]: ").strip() or "600")
 
     # Cloudflare配置
     if input("是否启用Cloudflare DNS? (y/N): ").lower().strip() == 'y':
         config['cloudflare']['enabled'] = True
-        config['cloudflare']['cloudflare_token'] = input("请输入Cloudflare API Token: ").strip()
+        config['cloudflare']['cloudflare_token'] = getpass.getpass("请输入Cloudflare API Token: ").strip()
         config['cloudflare']['zone_id'] = input("请输入Cloudflare Zone ID: ").strip()
         config['cloudflare']['ttl'] = int(input("请输入TTL值[默认120]: ").strip() or "120")
 
