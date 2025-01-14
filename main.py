@@ -7,10 +7,48 @@ from dns_providers.aliyun import AliyunDNS
 from dns_providers.cloudflare import CloudflareDNS
 
 
+def get_interactive_config():
+    """通过交互方式获取必要的配置"""
+    config = {
+        'common': {},
+        'aliyun': {'enabled': False},
+        'cloudflare': {'enabled': False}
+    }
+    
+    print("\n=== 基础配置 ===")
+    config['common']['subdomain'] = input("请输入子域名: ").strip()
+    config['common']['domain'] = input("请输入主域名: ").strip()
+    config['common']['check_interval'] = int(input("请输入检查间隔(秒)[默认3600]: ").strip() or "3600")
+    config['common']['ipv6_timeout'] = int(input("请输入IPv6超时时间(秒)[默认60]: ").strip() or "60")
+
+    print("\n=== DNS服务商配置 ===")
+    # Aliyun配置
+    if input("是否启用阿里云DNS? (y/N): ").lower().strip() == 'y':
+        config['aliyun']['enabled'] = True
+        config['aliyun']['access_key_id'] = input("请输入阿里云AccessKey ID: ").strip()
+        config['aliyun']['access_key_secret'] = input("请输入阿里云AccessKey Secret: ").strip()
+        config['aliyun']['ttl'] = int(input("请输入TTL值(600-86400)[默认600]: ").strip() or "600")
+
+    # Cloudflare配置
+    if input("是否启用Cloudflare DNS? (y/N): ").lower().strip() == 'y':
+        config['cloudflare']['enabled'] = True
+        config['cloudflare']['cloudflare_token'] = input("请输入Cloudflare API Token: ").strip()
+        config['cloudflare']['zone_id'] = input("请输入Cloudflare Zone ID: ").strip()
+        config['cloudflare']['ttl'] = int(input("请输入TTL值[默认120]: ").strip() or "120")
+
+    return config
+
+
 def load_config():
+    """尝试从文件加载配置，如果失败则使用交互式配置"""
     config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
-    with open(config_path, 'r', encoding='utf-8') as f:
-        return yaml.safe_load(f)
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except (FileNotFoundError, yaml.YAMLError) as e:
+        print(f"配置文件读取失败: {str(e)}")
+        print("切换到交互式配置模式...")
+        return get_interactive_config()
 
 
 def main():
